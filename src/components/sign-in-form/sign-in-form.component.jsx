@@ -1,7 +1,7 @@
 import { useState} from 'react'
 
 import FormInput from "../form-input/form-input.component";
-import Button from "../button/button.component";
+import Button, { BUTTON_TYPE_CLASSES } from "../button/button.component";
 
 
 
@@ -81,7 +81,7 @@ const SignInForm = () => {
             name: "email",
             type: "email",
             onChange: handleChange,
-            value: email,
+            value: {email},
           }}
         />
         <FormInput
@@ -91,12 +91,12 @@ const SignInForm = () => {
             name: "password",
             type: "password",
             onChange: handleChange,
-            value: password,
+            value: {password},
           }}
         />
         <ButtonsContainer>
           <Button type="submit">Sign In</Button>
-          <Button type='button' buttonType="google" onClick={signInFromGoogle}>
+          <Button type='button' buttonType={BUTTON_TYPE_CLASSES.google} onClick={signInFromGoogle}>
             Google Sign In
           </Button>
         </ButtonsContainer>

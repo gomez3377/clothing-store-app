@@ -79,7 +79,7 @@ const SignUpForm = () => {
                 onChange:handleChange,
                 name:"displayName",
                 type:"text",
-                value:displayName
+                value:{displayName}
             }
             }
         />
@@ -107,7 +107,7 @@ const SignUpForm = () => {
             onChange:handleChange,
             name:"password",
             type:"password",
-            value:password
+            value:{password}
 
         }}
         />
@@ -119,7 +119,7 @@ const SignUpForm = () => {
           onChange:handleChange,
           name:"confirmPassword",
           type:"password",
-          value:confirmPassword}}
+          value:{confirmPassword}}}
         />
 
         <Button type="submit">Sign Up</Button>

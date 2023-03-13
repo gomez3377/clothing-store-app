@@ -1,4 +1,5 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useReducer } from "react";
+import { createAction } from "../utils/reducer/reducer.utils";
 
 const addCartItem = (cartItems, productAdded) => {
   const existingCartItem = cartItems.find(
@@ -21,7 +22,7 @@ const removeCartItem = (cartItems, cartItemToRemove) => {
     (cartItem) => cartItem.id === cartItemToRemove.id
   );
   if (existingCartItem.quantity === 1) {
-    return cartItems.filter((cartItem) => cartItem.id != cartItemToRemove.id);
+    return cartItems.filter((cartItem) => cartItem.id !== cartItemToRemove.id);
   }
   return cartItems.map((cartItem) =>
     cartItem.id === cartItemToRemove.id
@@ -31,7 +32,7 @@ const removeCartItem = (cartItems, cartItemToRemove) => {
 };
 
 const clearCartItem = (cartItems, cartItemToClear) => {
-  return cartItems.filter((cartItem) => cartItem.id != cartItemToClear.id);
+  return cartItems.filter((cartItem) => cartItem.id !== cartItemToClear.id);
 };
 
 export const CartContext = createContext({
@@ -45,42 +46,89 @@ export const CartContext = createContext({
   totalValue: 0,
 });
 
-export const CartProvider = ({ children }) => {
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState([]);
-  const [cartCount, setCartCount] = useState(0);
-  const [totalValue, setTotalValue] = useState(0);
+export const CART_ACTION_TYPES = {
+  TOGGLE_CART: "TOGGLE_CART",
+  SET_CART_ITEMS: "SET_CART_ITEMS",
+};
 
-  useEffect(() => {
-    const newCartCount = cartItems.reduce(
+const cartReducer = (state, action) => {
+  const { type, payload } = action;
+
+  switch (type) {
+    case CART_ACTION_TYPES.SET_CART_ITEMS:
+      return {
+        ...state,
+        ...payload,
+      };
+      case CART_ACTION_TYPES.TOGGLE_CART:
+        return{
+          ...state,
+         isCartOpen: payload
+        }
+    default:
+      throw new Error(`Unhandled type ${type} in cartReducer`);
+  }
+};
+
+const INITIAL_STATE = {
+  isCartOpen: false,
+  cartItems: [],
+  cartCount: 0,
+  totalValue: 0,
+};
+
+export const CartProvider = ({ children }) => {
+  
+
+  const [{ cartItems, cartCount, totalValue, isCartOpen }, dispatch] = useReducer(
+    cartReducer,
+    INITIAL_STATE
+  );
+  const updateCartItemsReducer = (newCartItems) => {
+    const newCartCount = newCartItems.reduce(
       (total, cartItems) => total + cartItems.quantity,
       0
     );
-
-    
-    setCartCount(newCartCount);
-  }, [cartItems]);
-  
-  useEffect(() => {
-    
-    const newTotalValue = cartItems.reduce(
+    const newTotalValue = newCartItems.reduce(
       (total, cartItems) => total + cartItems.price * cartItems.quantity,
       0
-      );
-      setTotalValue(newTotalValue);
-  }, [cartItems])
+    );
+  
+
+    dispatch(
+      createAction(
+        CART_ACTION_TYPES.SET_CART_ITEMS,
+        {
+          cartItems: newCartItems,
+          totalValue: newTotalValue,
+          cartCount: newCartCount,
+
+        }
+      )
+ );
+  };
+
+
+// Actions that get passed through the reducer
 
   const addItemToCart = (productAdded) => {
-    setCartItems(addCartItem(cartItems, productAdded));
+    const newCartItems = addCartItem(cartItems, productAdded);
+    updateCartItemsReducer(newCartItems);
   };
 
   const removeItemFromCart = (productRemoved) => {
-    setCartItems(removeCartItem(cartItems, productRemoved));
+    const newCartItems = removeCartItem(cartItems, productRemoved);
+    updateCartItemsReducer(newCartItems);
   };
 
   const clearItemFromCart = (cartItemToClear) => {
-    setCartItems(clearCartItem(cartItems, cartItemToClear));
+    const newCartItems = clearCartItem(cartItems, cartItemToClear);
+    updateCartItemsReducer(newCartItems);
   };
+
+ const setIsCartOpen = (bool) => {
+  dispatch(createAction( CART_ACTION_TYPES.TOGGLE_CART, bool))
+  }
 
   const value = {
     isCartOpen,

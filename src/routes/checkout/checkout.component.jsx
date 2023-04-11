@@ -1,46 +1,48 @@
-import {useContext} from 'react'
+import { useSelector } from "react-redux";
 
-import CheckoutItem from '../../components/checkout-item/checkout-item.component'
+import CheckoutItem from "../../components/checkout-item/checkout-item.component";
 
-import { CartContext } from '../../contexts/cart.context'
-import { CheckoutContainer, CheckoutHeader, HeaderBlock, Total } from './checkout.styles'
-
-
+import {
+  selectCartItems,
+  selectCartTotal,
+} from "../../store/cart/cart.selector";
+import {
+  CheckoutContainer,
+  CheckoutHeader,
+  HeaderBlock,
+  Total,
+} from "./checkout.styles";
 
 const Checkout = () => {
-    const {cartItems, totalValue} = useContext(CartContext)
+  const cartItems = useSelector(selectCartItems);
+  const totalValue = useSelector(selectCartTotal);
 
   return (
     <CheckoutContainer>
-        <CheckoutHeader>
-            <HeaderBlock>
-                <span>Product</span>
-            </HeaderBlock>
-            <HeaderBlock>
-                <span>Description</span>
+      <CheckoutHeader>
+        <HeaderBlock>
+          <span>Product</span>
+        </HeaderBlock>
+        <HeaderBlock>
+          <span>Description</span>
+        </HeaderBlock>
+        <HeaderBlock>
+          <span>Quantity</span>
+        </HeaderBlock>
+        <HeaderBlock>
+          <span>Price</span>
+        </HeaderBlock>
+        <HeaderBlock>
+          <span>Remove</span>
+        </HeaderBlock>
+      </CheckoutHeader>
+      {cartItems.map((item) => (
+        <CheckoutItem key={item.id} cartItem={item} />
+      ))}
 
-            </HeaderBlock>
-            <HeaderBlock>
-                <span>Quantity</span>
-
-            </HeaderBlock>
-            <HeaderBlock>
-                <span>Price</span>
-
-            </HeaderBlock>
-            <HeaderBlock>
-
-                <span>Remove</span>
-            </HeaderBlock>
-        </CheckoutHeader>
-     {cartItems.map(item => <CheckoutItem key={item.id} cartItem={item} />
-         
-         )}
-     
-     
-    <Total>Total : ${totalValue}</Total>
+      <Total>Total : ${totalValue}</Total>
     </CheckoutContainer>
-  )
-}
+  );
+};
 
-export default Checkout
+export default Checkout;
